@@ -1,7 +1,7 @@
 <script setup>
 import {ref, watch, onMounted} from "vue";
-
-//TODO Разделить на компоненты (после реализации редактирования)
+import CharactersList from "./components/CharactersList.vue";
+import ModalEditCharacter from "@/components/modal/ModalEditCharacter.vue";
 
 const newName = ref('');
 const newLvl = ref(0);
@@ -9,8 +9,7 @@ const selectedClass = ref(null);
 const characters = ref([]);
 const classList = ref(['Воин', 'Лучник', 'Маг']);
 
-// переменные модалки
-const modalEditOpen = ref(false);
+const isModalEditOpen = ref(false);
 const editingCharacter = ref(null);
 
 // запускается при запуске/перезагрузке
@@ -25,7 +24,6 @@ onMounted(() => {
   }
 });
 
-// следит за значением characters и обновляет LS при изменении
 watch(characters, (newList) => {
   localStorage.setItem("characters", JSON.stringify(newList));
 }, {deep: true});
@@ -54,13 +52,21 @@ const addCharacter = () => {
 
 const removeCharacter = (id) => {
   characters.value = characters.value.filter(character => character.id !== id);
-};
-
-const editCharacter = (id) => {
-/* TODO Написать логику изменения персонажа + модалка для его изменения, выводить через v-if="modalEditOpen"
-    Либо сделать встроеным редактированием по схожей системе но без модалки, менять текст на инпуты и кнопка сохранить. */
 }
 
+const openEditModal = (character) => {
+  editingCharacter.value = {...character};
+  isModalEditOpen.value = true;
+}
+
+const saveChanges = (updatedCharacter) => {
+  const index = characters.value.findIndex(character => character.id === updatedCharacter.id);
+  if (index >= 0) {
+    characters.value.splice(index, 1, updatedCharacter);
+    isModalEditOpen.value = false;
+    editingCharacter.value = null;
+  }
+}
 
 </script>
 
@@ -98,30 +104,40 @@ const editCharacter = (id) => {
             {{c}}
           </option>
         </select>
-        <button @click="addCharacter">Добавить</button>
+        <button @click="addCharacter" class="add-character__add-btn button">Добавить</button>
       </div>
     </div>
-
-    <div class="characters">
-    <ul class="characters-list">
-      <li class="characters-list__item" v-for="hero in characters" :key="hero.id">
-        <span>
-        {{hero.name}} (уровень {{hero.lvl}}) - {{hero.combatClass}}
-        </span>
-        <button class="characters-list__delete-btn delete-btn" @click="removeCharacter(hero.id)">Удалить</button>
-      </li>
-    </ul>
-    <p v-if="characters.length === 0">Нет персонажей</p>
-    </div>
+    <CharactersList
+      :characters="characters"
+      @delete="removeCharacter"
+      @openEditModal="openEditModal"
+    />
+    <ModalEditCharacter
+    v-if="isModalEditOpen"
+    :character="editingCharacter"
+    @close="isModalEditOpen = false"
+    @save="saveChanges"
+    />
   </main>
 
 </template>
 
 <style lang="scss" scoped>
-$primary-color: #42b883;
+$primary-color: #339366;
 $danger-color: #f64a4a;
 $bg-dark: #1a1a1a;
 $text-light: #eeeeee;
+
+.button {
+  padding: 5px;
+  margin: 0 5px ;
+  background-color: $primary-color;
+  color: white;
+  border-radius: 4px;
+  &:hover {
+    background-color: #40b584;
+  }
+}
 
 .add-character {
   display: flex;
@@ -134,29 +150,6 @@ $text-light: #eeeeee;
     border: 1px solid #444;
     background: #333;
     color: white;
-  }
-}
-
-.characters-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  list-style: none;
-  margin: 10px 0;
-  padding: 0;
-  &__item {
-    border: 1px solid #e4e3e3;
-    border-radius: 4px;
-    padding: 6px;
-  }
-  &__delete-btn {
-    padding: 5px;
-    margin: 0 5px ;
-    background-color: $danger-color;
-    color: white;
-    &:hover {
-      background-color: #fb5e5e;
-    }
   }
 }
 
