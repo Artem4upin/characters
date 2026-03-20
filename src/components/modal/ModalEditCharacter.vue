@@ -30,14 +30,15 @@ const save = () => {
   <div class="modal-edit-character">
     <h3>Редактирование персонажа</h3>
     <div class="modal-edit-character__inputs">
-      <label />
-      <input v-model="character.name" type="text" class="modal-edit-character__input">
-      <input v-model="character.lvl" type="number" class="modal-edit-character__input">
+      <label for="characterName">Имя</label>
+      <input id="characterName" v-model="character.name" type="text" class="modal-edit-character__inputs__input">
+      <label for="characterLvl">Уровень</label>
+      <input id="characterLvl" v-model="character.lvl" type="number" class="modal-edit-character__inputs__input">
     </div>
     <span class="modal-edit-character__errors">{{errors}}</span>
     <div class="modal-edit-character__btns">
-      <button @click="save">Сохранить</button>
-      <button @click="$emit('close')">Отмена</button>
+      <button @click="save" class="modal-edit-character__btns__btn">Сохранить</button>
+      <button @click="$emit('close')" class="modal-edit-character__btns__btn">Отмена</button>
     </div>
   </div>
 </div>
@@ -63,11 +64,35 @@ const save = () => {
   min-width: 300px;
   border: 1px solid gray;
   background-color: white;
-  &__input {
+  &__inputs {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    &__input {
 
+    }
+  }
+  &__btns {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-top: 10px;
+    &__btn {
+      min-width: 85px;
+      max-width: 100px;
+    }
   }
   &__errors {
+    display: flex;
+    justify-content: center;
+    padding: 4px;
     color: red;
   }
+}
+h3 {
+  display: flex;
+  justify-content: center;
 }
 </style>

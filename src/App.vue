@@ -12,7 +12,7 @@ const classList = ref(['Воин', 'Лучник', 'Маг']);
 const isModalEditOpen = ref(false);
 const editingCharacter = ref(null);
 
-// запускается при запуске/перезагрузке
+// запускается при загрузке страницы
 onMounted(() => {
   const savedCharacters = localStorage.getItem("characters");
   try {
@@ -71,10 +71,6 @@ const saveChanges = (updatedCharacter) => {
 </script>
 
 <template>
-
-  <div class="modalEditCharacter">
-  </div>
-
   <header class="header">
     <h1>Персонажи</h1>
   </header>
